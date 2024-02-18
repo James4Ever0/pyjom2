@@ -30,3 +30,13 @@ SUBMIT
 ---
 
 better hands on video editing and enrich this video editing language syntax
+
+---
+
+the training perspective: time reverse training method.
+
+if what is being applied to the existing video clip is messy, try to do it in reverse, so that it will be restored into a good clip ready for release.
+
+you can mask certain clips, mangle the image, text, voice and ask the model to fill in.
+
+you can also apply a scoring perspective, using video critic trained on viewer statistics.
