@@ -26,7 +26,7 @@ One possible application for cplex is memory management, especially for cuda mem
 
 ---
 
-We aim to apply what is missing in the old pyjom repository: the scoring and monitoring framework, the semantic search engine, content creation agents, critics that can make existing video more attractive and many more.
+We aim to apply what is missing in the old pyjom repository: the scoring, tracking and monitoring framework, the semantic search engine, content creation agents, critics that can make existing video more attractive and many more.
 
 Most importantly, we aim to better assist human creators, for better prototyping and researching with solid proofs, so machines can be more useful than ever, eventually integrated into the core of our content automation system.
 
