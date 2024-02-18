@@ -20,6 +20,10 @@ The time is vital for our project. If one feature is taking too long to execute,
 
 Quality is equally important.
 
+---
+
+one possible application for cplex is memory management, especially for cuda memory. can also be applied to task management, decision making, etc. must based on previous data and adjust frequently.
+
 ## Star History
 
 <img src="https://api.star-history.com/svg?repos=james4ever0/pyjom2&Timeline" style="filter: invert(100%);"></img>
