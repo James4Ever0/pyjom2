@@ -3,7 +3,7 @@ import os
 from util import ensure_dir
 import beartype
 import datetime
-import schedule
+import schedule # use double schedulers to collect tsdb paths, register/cancel retention tasks and perform retention
 import tinyflux
 from context import contextify_db_with_lock
 from config import TSDB_DIR, TSDB_RETENTION_HOURS, TIMEZONE

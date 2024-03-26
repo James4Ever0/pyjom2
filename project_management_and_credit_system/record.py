@@ -54,7 +54,7 @@ def query_videos(
 
 
 def register_video_to_database(video_data: VideoRegisterData):
-    data = video_data.to_dict()
+    data = video_data.dict()
     # video url as unique
     with db.videodb_context() as vdb:
         vdb.upsert(data, cond=...)
