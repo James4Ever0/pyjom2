@@ -17,7 +17,7 @@ from typing import Optional, Literal
 import tsdb
 import db
 from config import HOST_ADDRESS, RECORD_PORT
-from endpoint import RecordEndpoint
+from enums import RecordEndpoint
 
 app = fastapi.FastAPI(
     title="Video Monitor API",

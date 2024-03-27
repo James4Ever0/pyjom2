@@ -3,34 +3,37 @@ import os
 from util import ensure_dir
 import beartype
 import datetime
-import schedule # use double schedulers to collect tsdb paths, register/cancel retention tasks and perform retention
+# call the retention mechanism when opening database context
+# import schedule # use double schedulers to collect tsdb paths, register/cancel retention tasks and perform retention
 import tinyflux
-from context import contextify_db_with_lock
+from context import contextify_db_factory_with_lock
 from config import TSDB_DIR, TSDB_RETENTION_HOURS, TIMEZONE
-from util import sync_time, strip_query_params
+from util import sync_time, parse_url_with_query_params
+from enums import VideoPlatform
 
 # to rebuild the retention policy:
 # https://tinyflux.readthedocs.io/en/latest/removing-data.html
 
 
-@contextify_db_with_lock
+@contextify_db_factory_with_lock
 def tsdb_context(db_path: str):
     ret = tinyflux.TinyFlux(db_path)
+    perform_retention(ret, TSDB_RETENTION_HOURS)
     return ret
 
 
 @beartype.beartype
-def get_vid_from_url_and_platform(url: str, platform: str):
-    url = strip_query_params(url)
-    if platform == "youtube":
-        return url.split("v=")[1]
-    elif platform == "bilibili":
+def get_vid_from_url_and_platform(url: str, platform: VideoPlatform):
+    url, query_params = parse_url_with_query_params(url)
+    if platform == VideoPlatform.youtube:
+        return query_params['v'][0] # this is query params
+    elif platform ==  VideoPlatform.bilibili:
         return url.split("/")[-1]
     else:
         raise ValueError("Unsupported platform")
 
 @beartype.beartype
-def get_tsdb_path_from_vid_and_platform(vid:str, platform:str):
+def get_tsdb_path_from_vid_and_platform(vid:str, platform:VideoPlatform):
     platform_dir = os.path.join(TSDB_DIR,platform)
     ensure_dir(platform_dir)
 

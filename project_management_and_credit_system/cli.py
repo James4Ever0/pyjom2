@@ -7,7 +7,7 @@
 # from typing import List
 from schema import *
 from config import *
-from endpoint import RecordEndpoint
+from enums import RecordEndpoint
 import argparse
 import requests
 

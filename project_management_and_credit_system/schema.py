@@ -1,7 +1,7 @@
 import pydantic
 from typing import Literal, List
 import datetime
-from util import strip_query_params
+from util import strip_url
 
 __all__ = ["VideoRegisterData", "ViewStatisticsArgs"]
 
@@ -15,7 +15,7 @@ class VideoRegisterData(pydantic.BaseModel):
     def validate_url(self, url):
         if not url.startswith("http"):
             raise ValueError("URL must start with http")
-        url = strip_query_params(url)
+        url = strip_url(url)
         return url
 
 class ViewStatisticsArgs(pydantic.BaseModel):

@@ -9,15 +9,23 @@ RECORD_PORT = 8042
 RECORD_URL = f"http://{HOST_ADDRESS}:{RECORD_PORT}"
 
 
-DB_DIR = os.path.join(SCRIPT_BASEDIR, "db")
+DATA_DIR =  os.path.join(SCRIPT_BASEDIR, "data")
+ensure_dir(DATA_DIR)
+
+DB_DIR = os.path.join(DATA_DIR, "db")
 ensure_dir(DB_DIR)
 
 VIDEODB_PATH = os.path.join(DB_DIR, "video_db.json")
 
-TSDB_DIR = os.path.join(SCRIPT_BASEDIR, "tsdb")
+TSDB_DIR = os.path.join(DATA_DIR, "tsdb")
 ensure_dir(TSDB_DIR)
 
 TSDB_RETENTION_HOURS = 1024
 
 TIMEZONE_STR = "Asia/Shanghai"
 TIMEZONE = pytz.timezone(TIMEZONE_STR)
+
+CHECKOUT_INTERVAL = 20 # do not lower this parameter unless you have cracked bilibili algorithm, or use browser request instead.
+
+COOKIE_BROWSER = "firefox"
+
