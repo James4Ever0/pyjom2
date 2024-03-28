@@ -25,6 +25,7 @@ TSDB_RETENTION_HOURS = 1024
 TIMEZONE_STR = "Asia/Shanghai"
 TIMEZONE = pytz.timezone(TIMEZONE_STR)
 
+SYNC_SLEEP_INTERVAL = 2
 CHECKOUT_INTERVAL = 20 # do not lower this parameter unless you have cracked bilibili algorithm, or use browser request instead.
 
 COOKIE_BROWSER = "firefox"

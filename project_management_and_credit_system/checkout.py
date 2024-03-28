@@ -4,13 +4,20 @@ import requests
 from typing import Union, Coroutine
 import beartype
 import time
-from config import CHECKOUT_INTERVAL
+from config import CHECKOUT_INTERVAL, SYNC_SLEEP_INTERVAL
 import bilibili_api
 import rich
 import random
 import wbi
 from constants import DEFAULT_UI
+from curl_cffi import requests as curl_requests
 
+# maybe it is tls fingerprinting.
+# yes it is!
+
+# so please let's improvise.
+
+# you are using httpx as backend. it is been detected by bilibili. better use something else.
 
 async def bilibili_user_get_videos(
     self,
@@ -52,6 +59,9 @@ async def bilibili_user_get_videos(
         }
     )
     params = wbi.modify_params(params)
+    # import urllib.parse
+    # print(urllib.parse.urlencode(params))
+    # breakpoint()
     headers = DEFAULT_UI.copy()
     # headers.update(
     #     {
@@ -65,23 +75,27 @@ async def bilibili_user_get_videos(
     #         "sec-fetch-site": "same-site",
     #     }
     # )
-    return (
-        await bilibili_api.user.Api(
-            **api,
-            credential=self.credential,
-            headers=headers,
-        )
-        .update_params(**params)
-        .result
-    )
+
+    return curl_requests.get(api['url'], params=params, headers=headers,impersonate="chrome120").json()
+    # return requests.get(api['url'], params=params, headers=headers).json()
+
+    # return (
+    #     await bilibili_api.user.Api(
+    #         **api,
+    #         credential=self.credential,
+    #         headers=headers,
+    #     )
+    #     .update_params(**params)
+    #     .result
+    # )
 
 
 bilibili_api.user.User.get_videos = bilibili_user_get_videos
 
 
-def sync_and_sleep(coroutine: Coroutine):
+def sync_and_sleep(coroutine: Coroutine, sleep_interval=SYNC_SLEEP_INTERVAL):
     ret = bilibili_api.sync(coroutine)
-    time.sleep(CHECKOUT_INTERVAL)
+    time.sleep(sleep_interval)
     return ret
 
 
@@ -108,7 +122,7 @@ def bilibili_get_all_videos_from_uid(uid: Union[str, int]):
     while True:
         rich.print(f"page #{page_num}")
         videos = sync_and_sleep(
-            user.get_videos(pn=page_num)
+            user.get_videos(pn=page_num) #, CHECKOUT_INTERVAL
         )  # will disconnect on second request.
         ret.update(videos)
         rich.print(videos)
@@ -124,6 +138,10 @@ viewcount_getters = {VideoPlatform.bilibili: bilibili_get_viewcount}
 if __name__ == "__main__":
     # ensure singleton, then checkout.
     # print(bilibili_get_viewcount("BV1GK4y1V7HP"))
-    uids = [85300402]
+    uids = [
+        # 85300402,
+        # i guess you add these invisible chars yourself.
+        1946720965,
+        ]
     for uid in uids:
         bilibili_get_all_videos_from_uid(uid)
