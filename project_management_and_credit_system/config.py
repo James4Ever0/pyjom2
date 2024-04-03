@@ -8,7 +8,6 @@ HOST_ADDRESS = "localhost"
 RECORD_PORT = 8042
 RECORD_URL = f"http://{HOST_ADDRESS}:{RECORD_PORT}"
 
-
 DATA_DIR =  os.path.join(SCRIPT_BASEDIR, "data")
 ensure_dir(DATA_DIR)
 
@@ -26,7 +25,7 @@ TIMEZONE_STR = "Asia/Shanghai"
 TIMEZONE = pytz.timezone(TIMEZONE_STR)
 
 SYNC_SLEEP_INTERVAL = 2
-CHECKOUT_INTERVAL = 20 # do not lower this parameter unless you have cracked bilibili algorithm, or use browser request instead.
+# CHECKOUT_INTERVAL = 20 # do not lower this parameter unless you have cracked bilibili algorithm, or use browser request instead.
 
 COOKIE_BROWSER = "firefox"
 

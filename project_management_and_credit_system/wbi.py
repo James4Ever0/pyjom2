@@ -4,7 +4,7 @@ import urllib.parse
 import time
 import requests
 
-from constants import DEFAULT_UI
+from constants import DEFAULT_USER_AGENT
 
 mixinKeyEncTab = [
     46,
@@ -103,7 +103,7 @@ def encWbi(params: dict, img_key: str, sub_key: str):
     return params
 
 
-def getWbiKeys(headers=DEFAULT_UI):  # -> tuple[str, str]
+def getWbiKeys(headers=DEFAULT_USER_AGENT):  # -> tuple[str, str]
     "获取最新的 img_key 和 sub_key"
     resp = requests.get("https://api.bilibili.com/x/web-interface/nav", headers=headers)
     resp.raise_for_status()
