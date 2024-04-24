@@ -1,9 +1,11 @@
 # fetch viewcount data from internet.
-from enums import RecordEndpoint, VideoPlatform
-
+from enums import VideoPlatform
+from typing import Callable, Dict
 import bilibili
 
-viewcount_getters = {VideoPlatform.bilibili: bilibili.bilibili_get_viewcount}
+viewcount_getters: Dict[VideoPlatform, Callable[[str], int]] = {
+    VideoPlatform.bilibili: bilibili.bilibili_get_viewcount
+}
 user_video_getters = {VideoPlatform.bilibili: bilibili.bilibili_get_all_videos_from_uid}
 
 if __name__ == "__main__":

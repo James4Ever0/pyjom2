@@ -8,5 +8,5 @@ def tinydb_context(db_path: str):
     return tinydb.TinyDB(db_path)
 
 
-def videodb_context():
+def videodb_context() -> tinydb.TinyDB:
     return tinydb_context(VIDEODB_PATH)

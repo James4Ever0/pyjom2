@@ -91,12 +91,12 @@ def encWbi(params: dict, img_key: str, sub_key: str):
         k: "".join(filter(lambda chr: chr not in "!'()*", str(v)))
         for k, v in params.items()
     }
-    
+
     query = urllib.parse.urlencode(params)  # 序列化参数
     # print(params)
     # print()
     # print(query)
-    
+
     # breakpoint()
     wbi_sign = md5((query + mixin_key).encode()).hexdigest()  # 计算 w_rid
     params["w_rid"] = wbi_sign

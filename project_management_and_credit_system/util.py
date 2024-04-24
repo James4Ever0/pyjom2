@@ -2,19 +2,36 @@ import os, sys
 import beartype
 from urllib.parse import urlparse, parse_qs
 
-INVISIBLE_CHARS = ['\ufeff','\u200c','\u200d']
+INVISIBLE_CHARS = ["\ufeff", "\u200c", "\u200d"]
+import enums
+from enums import VideoPlatform
+
+
+@beartype.beartype
+def get_vid_from_url_and_platform(url: str, platform: VideoPlatform):
+    url, query_params = parse_url_with_query_params(url)
+    if platform == VideoPlatform.youtube:
+        return query_params["v"][0]  # this is query params
+    elif platform == VideoPlatform.bilibili:
+        return url.split("/")[-1]
+    else:
+        raise ValueError("Unsupported platform")
+
+
+@beartype.beartype
+def get_url_from_vid_and_platform(vid: str, platform: VideoPlatform):
+    if platform == VideoPlatform.bilibili:
+        return f"https://www.bilibili.com/video/{vid}"
+    elif platform == VideoPlatform.youtube:
+        return f"https://www.youtube.com/watch?v={vid}"
+    else:
+        raise Exception("Unsupported video platform:", platform)
+
 
 def remove_invisible_chars(text: str):
     for invisible_char in INVISIBLE_CHARS:
-        text = text.replace(invisible_char, '')
+        text = text.replace(invisible_char, "")
     return text
-
-@beartype.beartype
-def ensure_dir(dir_path: str):
-    if os.path.exists(dir_path) is False:
-        os.mkdir(dir_path)
-    elif not os.path.isdir(dir_path):
-        raise Exception(f"Path '{dir_path}' exists but is not a directory")
 
 
 def execute_commands(commands: list[str]):
@@ -68,11 +85,14 @@ def parse_url_with_anchor_and_query_params(url: str):
     # url, query = split_url_components(url,"?")
     return url, anchor, query_params
 
+
 @beartype.beartype
 def parse_url_with_query_params(url: str):
     url, _, query_params = parse_url_with_anchor_and_query_params(url)
     return url, query_params
+
+
 @beartype.beartype
-def strip_url(url:str):
+def strip_url(url: str):
     url, _, _ = parse_url_with_anchor_and_query_params(url)
     return url

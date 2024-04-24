@@ -108,11 +108,11 @@ def sync_and_sleep(coroutine: Coroutine, sleep_interval=SYNC_SLEEP_INTERVAL):
 
 
 @beartype.beartype
-def bilibili_get_viewcount(vid: str):
+def bilibili_get_viewcount(vid: str) -> int:
     v = bilibili_api.video.Video(vid)
     info = sync_and_sleep(v.get_info())
     # rich.print(info)
-    viewcount = info["stat"]["view"]
+    viewcount = int(info["stat"]["view"])
     # let's forget about the publish date. it is only valuable to bilibili internal algorithms.
     # pubdate = info['pubdate']
     return viewcount
@@ -126,13 +126,14 @@ def bilibili_get_all_videos_from_uid(uid: Union[str, int]):
 
     user = bilibili_api.user.User(uid)
     page_num = 1
-    ret = {}
+    ret = []
     while True:
         rich.print(f"page #{page_num}")
         videos = sync_and_sleep(
             user.get_videos(pn=page_num)  # , CHECKOUT_INTERVAL
         )  # will disconnect on second request.
-        ret.update(videos)
+        # what are you doing?
+        ret.extend(videos)
         rich.print(videos)
         if videos:
             page_num += 1

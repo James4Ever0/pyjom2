@@ -58,7 +58,7 @@ if args.command == "register_video":
     # make request
     reply = requests.post(
         RecordEndpoint.register_video.url,
-        data=register_video_args.dict(),
+        json=register_video_args.dict(),
     )
     data = reply.json()
 elif args.command == "view_statistics":
@@ -67,6 +67,6 @@ elif args.command == "view_statistics":
     print(view_statistics_args.dict())
     reply = requests.get(
         RecordEndpoint.query_videos.url,
-        params=dict(platform=view_statistics_args.platform),
+        params=dict(platform=view_statistics_args.platform, type="random"),
     )
     data = reply.json()

@@ -21,7 +21,8 @@ def extract_cookies_for_sitelist(sitelist=list[str]) -> dict[str, str]:
     return ret
 
 
-def get_all_possible_sites(): return list(BROWSER_COOKIEJAR._cookies.keys())
+def get_all_possible_sites():
+    return list(BROWSER_COOKIEJAR._cookies.keys())
 
 
 if __name__ == "__main__":

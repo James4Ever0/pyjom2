@@ -1,5 +1,5 @@
 import os
-from util import ensure_dir
+from dirutil import ensure_dir
 import pytz
 
 SCRIPT_BASEDIR = os.path.dirname(__file__)
@@ -8,7 +8,7 @@ HOST_ADDRESS = "localhost"
 RECORD_PORT = 8042
 RECORD_URL = f"http://{HOST_ADDRESS}:{RECORD_PORT}"
 
-DATA_DIR =  os.path.join(SCRIPT_BASEDIR, "data")
+DATA_DIR = os.path.join(SCRIPT_BASEDIR, "data")
 ensure_dir(DATA_DIR)
 
 DB_DIR = os.path.join(DATA_DIR, "db")
@@ -29,3 +29,12 @@ SYNC_SLEEP_INTERVAL = 2
 
 COOKIE_BROWSER = "firefox"
 
+VIDEO_CHECKOUT_TASK_INTERVAL = 60
+"""
+in minutes
+"""
+
+TASK_MAIN_LOOP_INTERVAL = 30
+"""
+in seconds
+"""
