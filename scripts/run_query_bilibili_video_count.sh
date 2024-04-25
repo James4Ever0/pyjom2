@@ -1,1 +1,1 @@
-curl "http://localhost:8042/query/current_view_count?vid=...&platform=bilibili"
+curl "http://localhost:8042/query/current_view_count?vid=BV1Qt4y1k7cK&platform=bilibili"
