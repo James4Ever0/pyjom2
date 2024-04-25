@@ -1,0 +1,1 @@
+curl "http://localhost:8042/query/current_view_count?vid=...&platform=bilibili"
