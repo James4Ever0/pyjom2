@@ -70,3 +70,5 @@ elif args.command == "view_statistics":
         params=dict(platform=view_statistics_args.platform, type="random"),
     )
     data = reply.json()
+    print("Reply data:")
+    print(data)

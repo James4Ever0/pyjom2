@@ -2,7 +2,7 @@ import strenum
 from config import RECORD_URL
 from enum import auto
 from typing import Annotated
-from beartype.vale import IsInstance
+from beartype.vale import Is
 
 class VideoPlatform(strenum.StrEnum):
     youtube = auto()
@@ -18,7 +18,7 @@ class VideoPlatform(strenum.StrEnum):
         except ValueError:
             return False
 
-VideoPlatformType = Annotated[str, lambda it: VideoPlatform.check_is_valid_video_platform(it)]
+VideoPlatformType = Annotated[str, Is[lambda it: VideoPlatform.check_is_valid_video_platform(it)]]
 
 class RecordEndpoint(strenum.StrEnum):
     query_history_view_count = "/query/history_view_count"

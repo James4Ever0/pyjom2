@@ -12,7 +12,8 @@
 # https://github.com/PrefectHQ/prefect/issues?q=retention
 
 import checkout
-import db, tsdb, enums, schema
+# import db, tsdb
+import enums, schema
 import schedule
 import requests
 from typing import Callable, List
@@ -44,9 +45,9 @@ def checkout_video_viewcount_and_submit_by_vid(vid: int, platform: enums.VideoPl
     video_statistics = schema.VideoStatistics(
         platform=platform, view_count=view_count, vid=vid
     )
-    submit_response = requests.get(
+    submit_response = requests.post(
         enums.RecordEndpoint.submit_video_statistics.url,
-        params=video_statistics.dict(),
+        json=video_statistics.dict(),
     )  # assert success.
     submit_success = submit_response.json()["success"]
 

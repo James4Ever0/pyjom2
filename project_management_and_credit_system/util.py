@@ -4,11 +4,11 @@ from urllib.parse import urlparse, parse_qs
 
 INVISIBLE_CHARS = ["\ufeff", "\u200c", "\u200d"]
 import enums
-from enums import VideoPlatform
+from enums import VideoPlatform, VideoPlatformType
 
 
 @beartype.beartype
-def get_vid_from_url_and_platform(url: str, platform: VideoPlatform):
+def get_vid_from_url_and_platform(url: str, platform: VideoPlatformType):
     url, query_params = parse_url_with_query_params(url)
     if platform == VideoPlatform.youtube:
         return query_params["v"][0]  # this is query params
@@ -19,7 +19,7 @@ def get_vid_from_url_and_platform(url: str, platform: VideoPlatform):
 
 
 @beartype.beartype
-def get_url_from_vid_and_platform(vid: str, platform: VideoPlatform):
+def get_url_from_vid_and_platform(vid: str, platform: VideoPlatformType):
     if platform == VideoPlatform.bilibili:
         return f"https://www.bilibili.com/video/{vid}"
     elif platform == VideoPlatform.youtube:

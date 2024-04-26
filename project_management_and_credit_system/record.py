@@ -18,6 +18,7 @@ import db
 from config import HOST_ADDRESS, RECORD_PORT
 from enums import RecordEndpoint
 import util
+import functools
 
 app = fastapi.FastAPI(
     title="Video Monitor API",
@@ -25,23 +26,45 @@ app = fastapi.FastAPI(
     version="1.0",
 )
 
+def query_current_view_count(vid: str, platform: str, diff:bool=False):
+    # get latest view count with measurement timestamp
+    datalist = query_history_view_count(vid, platform, diff)
 
-@app.get(RecordEndpoint.query_current_view_count)
-def query_current_view_count(url: str):
-    # Add your implementation here
-    return {"data": "Current view count"}
+    return datalist[-1]  # last to be latest or first?
 
+def query_history_view_count(vid: str, platform: str, diff:bool=False):
+    # get a list of view counts
+    datalist = tsdb.query_view_count_list_by_vid_and_platform(vid, platform)
+    if diff:
+        datalist = tsdb.differentiate_data_by_key_and_timestamp_key(datalist, key='view_count')
+    return datalist
 
-@app.get(RecordEndpoint.query_history_view_count)
-def query_history_view_count(url: str):
-    # Add your implementation here
-    return {"data": "History view count"}
-
+@app.get(RecordEndpoint.query_current_view_count)(query_current_view_count)
+@app.get(RecordEndpoint.query_history_view_count)(query_history_view_count)
 
 @app.get(RecordEndpoint.query_video_url)
 def query_video_url(projectPath: Optional[str], videoPath: Optional[str]):
-    # Add your implementation here
-    return {"data": "Video URL"}
+    conditions = []
+    query = db.tinydb.Query()
+    if projectPath is not None:
+        conditions.append(query.project_path == projectPath)
+    if videoPath is not None:
+        conditions.append(query.video_path == videoPath)
+    if conditions == []:
+        raise fastapi.HTTPException(
+            status_code=400,
+            detail="No condition was specified while querying video url",
+        )
+    with db.videodb_context() as vdb:
+        cond = functools.reduce(lambda x, y: x & y, conditions)
+        candidates = vdb.search(cond=cond)
+        info = "Not found"
+        url = "unknown"
+        if len(candidates) == 1:
+            info = "Found"
+            url = candidates[0]["url"]
+        ret = dict(info=info, url=url)
+        return ret
 
 
 @app.get(RecordEndpoint.query_videos)
@@ -54,11 +77,11 @@ def query_videos(
     with db.videodb_context() as vdb:
         candidates = vdb.search(cond=db.tinydb.Query().platform == platform)[:limit]
         for it in candidates:
-            url= it["url"]
+            url = it["url"]
             vid = util.get_vid_from_url_and_platform(url, platform)
             data.append(vid)
     # Add your implementation here
-    return {"status": "success", "data": data}
+    return {"status": "success", "data": data, "stats": candidates}
 
 
 def register_video_to_database(video_data: VideoRegisterData):

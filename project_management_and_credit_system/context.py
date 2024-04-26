@@ -6,7 +6,7 @@ from typing import Callable, TypeVar  # ,cast
 T = TypeVar("T")
 
 
-def contextify_db_factory_with_lock(func: Callable[[], T]):
+def contextify_db_factory_with_lock(func: Callable[[], T]) -> Callable[[], T]:
     @contextlib.contextmanager
     @beartype.beartype
     def context_func(db_path: str):
