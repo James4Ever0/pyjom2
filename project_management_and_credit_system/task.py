@@ -11,7 +11,9 @@
 # ref:
 # https://github.com/PrefectHQ/prefect/issues?q=retention
 
+import rich.text
 import checkout
+
 # import db, tsdb
 import enums, schema
 import schedule
@@ -20,6 +22,9 @@ from typing import Callable, List
 import time
 from config import VIDEO_CHECKOUT_TASK_INTERVAL, TASK_MAIN_LOOP_INTERVAL
 import util
+import rich
+
+console = rich.console.Console()
 
 
 def register_tasks(tasks: List[Callable[[], None]]):
@@ -50,6 +55,22 @@ def checkout_video_viewcount_and_submit_by_vid(vid: int, platform: enums.VideoPl
         json=video_statistics.dict(),
     )  # assert success.
     submit_success = submit_response.json()["success"]
+    return submit_success
+
+
+def log_task_status(success: bool, task_info: str):
+    text = rich.text.Text()
+
+    state = "FAILED"
+    color = "red"
+
+    if success:
+        state = "SUCCESS"
+        color = "green"
+
+    text.append(f"[{state}] ", style=color)
+    text.append(task_info)
+    console.print(text)
 
 
 def video_checkout_task(platform: enums.VideoPlatform):
@@ -62,7 +83,8 @@ def video_checkout_task(platform: enums.VideoPlatform):
     all_video_ids = response.json()["data"]
     print(f"Checking out {len(all_video_ids)} videos")
     for vid in all_video_ids:
-        checkout_video_viewcount_and_submit_by_vid(vid, platform)
+        success = checkout_video_viewcount_and_submit_by_vid(vid, platform)
+        log_task_status(success, f"Checkout task <VID: {vid}, PLATFORM: {platform}>")
 
 
 def bilibili_add_all_videos_of_user_to_db(uid: str):
@@ -84,6 +106,9 @@ def add_videos_to_db_by_urls(urls: List[str], platform: enums.VideoPlatform):
             enums.RecordEndpoint.register_video.url,
             data=schema.VideoRegisterData(url=it, platform=platform),
         )  # TODO: log unsuccessful tasks
+        success = reply.json()["success"]
+        log_task_status(success, f"Video register task <URL: {it}, PLATFORM: {platform}>")
+
 
 
 if __name__ == "__main__":

@@ -19,6 +19,7 @@ from config import HOST_ADDRESS, RECORD_PORT
 from enums import RecordEndpoint
 import util
 import functools
+import random
 
 app = fastapi.FastAPI(
     title="Video Monitor API",
@@ -26,21 +27,27 @@ app = fastapi.FastAPI(
     version="1.0",
 )
 
-def query_current_view_count(vid: str, platform: str, diff:bool=False):
+
+def query_current_view_count(vid: str, platform: str, diff: bool = False):
     # get latest view count with measurement timestamp
     datalist = query_history_view_count(vid, platform, diff)
 
     return datalist[-1]  # last to be latest or first?
 
-def query_history_view_count(vid: str, platform: str, diff:bool=False):
+
+def query_history_view_count(vid: str, platform: str, diff: bool = False):
     # get a list of view counts
     datalist = tsdb.query_view_count_list_by_vid_and_platform(vid, platform)
     if diff:
-        datalist = tsdb.differentiate_data_by_key_and_timestamp_key(datalist, key='view_count')
+        datalist = tsdb.differentiate_data_by_key_and_timestamp_key(
+            datalist, key="view_count"
+        )
     return datalist
 
-@app.get(RecordEndpoint.query_current_view_count)(query_current_view_count)
-@app.get(RecordEndpoint.query_history_view_count)(query_history_view_count)
+
+app.get(RecordEndpoint.query_current_view_count)(query_current_view_count)
+app.get(RecordEndpoint.query_history_view_count)(query_history_view_count)
+
 
 @app.get(RecordEndpoint.query_video_url)
 def query_video_url(projectPath: Optional[str], videoPath: Optional[str]):
@@ -67,20 +74,54 @@ def query_video_url(projectPath: Optional[str], videoPath: Optional[str]):
         return ret
 
 
+# TODO: add more filters like the author or database name
 @app.get(RecordEndpoint.query_videos)
 def query_videos(
     platform: Optional[str],
     type: Literal["latest", "trending", "popular", "random"],  # currently not used.
     limit: int = 20,
+    db_path: Optional[str] = None,
 ):
+
     data = []
-    with db.videodb_context() as vdb:
-        candidates = vdb.search(cond=db.tinydb.Query().platform == platform)[:limit]
+    NOT_IMPLEMENTED_EXCEPTION = fastapi.HTTPException(
+        400, detail=f'Sorting method "{type}" not implemented.'
+    )
+    with (
+        db.tinydb_context(db_path) if db_path is not None else db.videodb_context()
+    ) as vdb:
+        candidates = vdb.search(cond=db.tinydb.Query().platform == platform)
+
+        if type == "latest":  # TODO: recently published
+            raise NOT_IMPLEMENTED_EXCEPTION
+        elif type == "popular":  # most viewed
+            candidates.sort(
+                key=lambda it: -(
+                    query_current_view_count(it["vid"], it["platform"])["view_count"]
+                )
+            )
+        elif type == "random":  # shuffle
+            random.shuffle(candidates)
+        elif type == "trending":  # with highest speed
+            candidates.sort(
+                key=lambda it: -(
+                    query_current_view_count(it["vid"], it["platform"], diff=True)[
+                        "view_count"
+                    ]["rate"]
+                )
+            )
+        else:
+            raise fastapi.HTTPException(
+                400, detail=f'Unsupported sorting method: "{type}"'
+            )
+
+        candidates = candidates[:limit]
+
         for it in candidates:
             url = it["url"]
             vid = util.get_vid_from_url_and_platform(url, platform)
             data.append(vid)
-    # Add your implementation here
+
     return {"status": "success", "data": data, "stats": candidates}
 
 
@@ -94,7 +135,6 @@ def register_video_to_database(video_data: VideoRegisterData):
 # you should start here
 @app.post(RecordEndpoint.register_video)
 def register_video(video_data: VideoRegisterData):
-    # Add your implementation here
     success = False
     success = register_video_to_database(video_data)
     return {"success": success}
