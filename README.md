@@ -30,6 +30,12 @@ We aim to apply what is missing in the old pyjom repository: the scoring, tracki
 
 Most importantly, we aim to better assist human creators, for better prototyping, more confident trial-and-errors and researching with solid proofs, so machines can be more useful than ever, eventually integrated into the core of our content automation system.
 
+
+## TODO
+
+- Collect all viewed and favorited videos, scrape text, links
+- Build a scraper focus on network security, robotics and computer agents
+
 ## Star History
 
 <img src="https://api.star-history.com/svg?repos=james4ever0/pyjom2&Timeline" style="filter: invert(100%);"></img>
